@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Journal Canvas — Open Source Knowledge Graph for Your Notes</title>
+  <meta name="description" content="Journal Canvas reads your notes and builds a live knowledge graph of every person, place, event, and theme inside them. Free and open source." />
+  <meta property="og:title" content="Journal Canvas" />
+  <meta property="og:description" content="An open-source AI-powered knowledge graph for your notes." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg0: #080808;
+      --bg1: #111;
+      --bg2: #181818;
+      --border: #252525;
+      --text0: #f0f0f0;
+      --text1: #999;
+      --text2: #555;
+      --person:    #C4956A;
+      --event:     #C46868;
+      --place:     #6EA882;
+      --theme:     #A87C72;
+      --document:  #7A9EA0;
+      --concept:   #88A87C;
+      --character: #A88A5C;
+      --accent:    #C4956A;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg0);
+      color: var(--text0);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { opacity: 0.8; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(8,8,8,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text0);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { font-size: 13px; color: var(--text1); }
+    .nav-links a:hover { color: var(--text0); opacity: 1; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.14s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text1);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text1);
+      margin-bottom: 28px;
+      background: var(--bg1);
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--place);
+    }
+
+    h1 {
+      font-size: clamp(38px, 7vw, 76px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 22px;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--text1);
+      max-width: 560px;
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    /* ── Graph preview ── */
+    .graph-preview {
+      margin-top: 72px;
+      width: 100%;
+      max-width: 900px;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      padding: 32px;
+    }
+
+    .graph-demo {
+      position: relative;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .node-group {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .demo-count { font-size: 9px; color: #FF69B4; font-weight: 600; }
+
+    .demo-bar {
+      width: 24px;
+      border-radius: 3px;
+    }
+
+    .demo-label {
+      font-size: 9.5px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .demo-edge {
+      position: absolute;
+      background: var(--border);
+      height: 1px;
+      transform-origin: left center;
+    }
+
+    /* ── Features ── */
+    section { padding: 96px 24px; }
+
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text2);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      margin-bottom: 14px;
+    }
+
+    .section-body {
+      font-size: 17px;
+      color: var(--text1);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      margin: 56px auto 0;
+    }
+
+    .feature-card {
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .feature-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+      background: var(--bg2);
+    }
+
+    .feature-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--text1);
+      line-height: 1.6;
+    }
+
+    /* ── How it works ── */
+    .steps {
+      max-width: 700px;
+      margin: 56px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .step-desc { font-size: 14px; color: var(--text1); line-height: 1.6; }
+
+    /* ── Tech stack ── */
+    .stack-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .stack-pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text1);
+      background: var(--bg1);
+    }
+
+    /* ── CTA ── */
+    .cta {
+      text-align: center;
+      padding: 96px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta h2 {
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+    }
+
+    .cta p {
+      font-size: 17px;
+      color: var(--text1);
+      margin-bottom: 36px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 28px 40px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .entity-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .entity-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    /* center wrappers */
+    .center { text-align: center; }
+    .max-w { max-width: 960px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Journal Canvas</div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="https://github.com/lafeo/journal-canvas" target="_blank">GitHub</a>
+    <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-primary" target="_blank">Download</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Open source · MIT License
+  </div>
+
+  <h1>Your notes,<br/>as a knowledge graph</h1>
+
+  <p class="hero-sub">
+    Journal Canvas reads your Markdown and text files, extracts every person, place, event, and theme using AI, and builds a live graph so you can see how everything connects.
+  </p>
+
+  <div class="entity-dots">
+    <div class="entity-dot" style="background:#C4956A" title="People"></div>
+    <div class="entity-dot" style="background:#C46868" title="Events"></div>
+    <div class="entity-dot" style="background:#6EA882" title="Places"></div>
+    <div class="entity-dot" style="background:#A87C72" title="Themes"></div>
+    <div class="entity-dot" style="background:#7A9EA0" title="Documents"></div>
+    <div class="entity-dot" style="background:#88A87C" title="Concepts"></div>
+  </div>
+
+  <div class="hero-actions">
+    <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-primary" target="_blank">
+      ↓ Download for macOS
+    </a>
+    <a href="https://github.com/lafeo/journal-canvas" class="btn btn-ghost" target="_blank">
+      View on GitHub
+    </a>
+  </div>
+
+  <!-- Fake graph demo -->
+  <div class="graph-preview">
+    <div class="graph-demo" id="demo"></div>
+  </div>
+</div>
+
+<!-- Features -->
+<section id="features">
+  <div class="max-w center">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything lives in your files</h2>
+    <p class="section-body" style="margin:0 auto">
+      No proprietary database. No sync service. Journal Canvas works with plain text files you already own.
+    </p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⬡</div>
+      <div class="feature-title">Live knowledge graph</div>
+      <div class="feature-desc">A force-directed graph that clusters nodes by how many documents they share — not by type. Heavily connected entities pull together naturally.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◈</div>
+      <div class="feature-title">AI entity extraction</div>
+      <div class="feature-desc">Claude reads each document and extracts people, places, events, themes, and concepts. Existing entities are recognised and merged, never duplicated.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📖</div>
+      <div class="feature-title">Inline reader</div>
+      <div class="feature-desc">Click any node to read every document it appears in. Every entity in the text is colour-highlighted. Click a name to focus the graph on it.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✎</div>
+      <div class="feature-title">Click-to-edit</div>
+      <div class="feature-desc">Click anywhere on a document in the reader to edit it. Saves automatically on blur, then re-analyses and updates the graph.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Theme & concept sidebar</div>
+      <div class="feature-desc">Themes and concepts live in a dedicated sidebar. Click one to instantly illuminate everything connected to it across the graph.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">◌</div>
+      <div class="feature-title">Hide without deleting</div>
+      <div class="feature-desc">Hide any note from the graph without touching the file. Its entities vanish from the graph. Restore in one click whenever you need them back.</div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how-it-works" style="background: var(--bg1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="max-w center">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">From files to graph in seconds</h2>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Point it at your notes folder</div>
+        <div class="step-desc">Any folder of <code>.md</code> or <code>.txt</code> files works. Journal Canvas watches the folder for changes in real time.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Claude extracts structured knowledge</div>
+        <div class="step-desc">Each document is sent to Claude with your existing entity list. Claude identifies people, places, events, themes, concepts — and reuses names it has already seen.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">The graph builds itself</div>
+        <div class="step-desc">Entities that co-appear in documents are linked. A D3 force simulation settles the graph into natural clusters. The more two entities appear together, the closer they sit.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Explore, read, and edit</div>
+        <div class="step-desc">Click nodes to focus their connections. Open the reader to see every mention of an entity across all your notes. Edit inline — changes update the graph automatically.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stack -->
+<section>
+  <div class="max-w center">
+    <div class="section-label">Built with</div>
+    <h2 class="section-title">Open source, all the way down</h2>
+    <p class="section-body" style="margin:0 auto">No telemetry. No accounts. Your notes never leave your machine except for the Claude API call you make with your own key.</p>
+  </div>
+  <div class="stack-pills" style="justify-content:center">
+    <span class="stack-pill">Electron</span>
+    <span class="stack-pill">React 18</span>
+    <span class="stack-pill">Vite</span>
+    <span class="stack-pill">React Flow</span>
+    <span class="stack-pill">D3-force</span>
+    <span class="stack-pill">Zustand</span>
+    <span class="stack-pill">Claude API</span>
+    <span class="stack-pill">MIT License</span>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>Start mapping your notes</h2>
+  <p>Free forever. No account needed. Bring your own Claude API key.</p>
+  <div class="hero-actions">
+    <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-primary" target="_blank">↓ Download</a>
+    <a href="https://github.com/lafeo/journal-canvas" class="btn btn-ghost" target="_blank">Star on GitHub ★</a>
+  </div>
+</div>
+
+<footer>
+  <span>Journal Canvas · MIT License</span>
+  <span>Made by <a href="https://github.com/lafeo" style="color:var(--text1)">@lafeo</a></span>
+</footer>
+
+<script>
+  // Draw a simple fake graph in the hero demo area
+  const demo = document.getElementById('demo')
+
+  const nodes = [
+    { label: 'Dr. Priya Sharma', color: '#C4956A', count: 4, x: 50,  y: 50  },
+    { label: 'Germany',          color: '#6EA882', count: 5, x: 75,  y: 30  },
+    { label: 'climate change',   color: '#A87C72', count: 4, x: 62,  y: 68  },
+    { label: 'Indian engineers', color: '#7A9EA0', count: 2, x: 35,  y: 38  },
+    { label: 'Olaf Scholz',      color: '#C4956A', count: 3, x: 85,  y: 55  },
+    { label: 'Delhi',            color: '#6EA882', count: 2, x: 28,  y: 60  },
+    { label: 'brain drain',      color: '#A87C72', count: 2, x: 45,  y: 72  },
+    { label: 'Arjun Mehta',      color: '#C4956A', count: 2, x: 20,  y: 46  },
+  ]
+
+  const edges = [
+    [0,1],[0,2],[0,5],[0,6],[1,4],[1,2],[2,5],[2,6],[3,0],[3,8],[6,3],[7,3],[7,6]
+  ]
+
+  const W = demo.clientWidth || 860
+  const H = 280
+
+  const minH = 10, maxH = 44
+  const counts = nodes.map(n => n.count)
+  const maxC = Math.max(...counts), minC = Math.min(...counts)
+
+  // Draw edges first
+  edges.forEach(([a, b]) => {
+    if (!nodes[a] || !nodes[b]) return
+    const na = nodes[a], nb = nodes[b]
+    const x1 = na.x / 100 * W, y1 = na.y / 100 * H
+    const x2 = nb.x / 100 * W, y2 = nb.y / 100 * H
+    const len = Math.sqrt((x2-x1)**2 + (y2-y1)**2)
+    const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI
+    const el = document.createElement('div')
+    el.className = 'demo-edge'
+    Object.assign(el.style, {
+      left: x1 + 'px', top: y1 + 'px',
+      width: len + 'px',
+      transform: `rotate(${angle}deg)`,
+      opacity: '0.18',
+    })
+    demo.appendChild(el)
+  })
+
+  // Draw nodes
+  nodes.forEach(n => {
+    const bh = maxC === minC ? 28 : Math.round(minH + ((n.count - minC) / (maxC - minC)) * (maxH - minH))
+    const x = n.x / 100 * W - 12
+    const totalH = 14 + 4 + bh + 4 + 14
+    const y = n.y / 100 * H - totalH / 2
+
+    const g = document.createElement('div')
+    g.className = 'node-group'
+    Object.assign(g.style, { left: x + 'px', top: y + 'px' })
+
+    const cnt = document.createElement('div')
+    cnt.className = 'demo-count'
+    cnt.textContent = n.count
+    g.appendChild(cnt)
+
+    const bar = document.createElement('div')
+    bar.className = 'demo-bar'
+    Object.assign(bar.style, { height: bh + 'px', backgroundColor: n.color, borderRadius: '3px' })
+    g.appendChild(bar)
+
+    const lbl = document.createElement('div')
+    lbl.className = 'demo-label'
+    Object.assign(lbl.style, { color: n.color })
+    lbl.textContent = n.label
+    g.appendChild(lbl)
+
+    demo.appendChild(g)
+  })
+</script>
+
+</body>
+</html>
