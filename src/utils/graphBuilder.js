@@ -10,14 +10,14 @@ import {
 // ── Colors ───────────────────────────────────────────────────────────────────
 
 export const COLORS = {
-  person:    { edge: '#C4956A', border: '#9A6840' },
-  event:     { edge: '#C46868', border: '#9A4040' },
-  place:     { edge: '#6EA882', border: '#447A56' },
-  theme:     { edge: '#A87C72', border: '#7A5048' },
-  todo:      { edge: '#B0A07C', border: '#7A6A4A' },
-  document:  { edge: '#7A9EA0', border: '#4A7070' },
-  concept:   { edge: '#88A87C', border: '#567850' },
-  character: { edge: '#A88A5C', border: '#785E30' },
+  person:    { edge: '#A78BFA', border: '#7C3AED' },  // purple
+  event:     { edge: '#F87171', border: '#DC2626' },  // soft red
+  place:     { edge: '#34D399', border: '#059669' },  // green
+  theme:     { edge: '#F472B6', border: '#DB2777' },  // hot pink
+  todo:      { edge: '#94A3B8', border: '#64748B' },  // slate
+  document:  { edge: '#60A5FA', border: '#2563EB' },  // blue
+  concept:   { edge: '#2DD4BF', border: '#0D9488' },  // teal
+  character: { edge: '#C084FC', border: '#9333EA' },  // violet
 }
 
 // ── Cluster focal points for entity mode ──────────────────────────────────────

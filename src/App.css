@@ -11,14 +11,14 @@
   --text1: #a0a0a0;
   --text2: #555;
 
-  --person:    #C4956A;
-  --event:     #C46868;
-  --place:     #6EA882;
-  --theme:     #A87C72;
-  --todo:      #B0A07C;
-  --document:  #7A9EA0;
-  --concept:   #88A87C;
-  --character: #A88A5C;
+  --person:    #A78BFA;
+  --event:     #F87171;
+  --place:     #34D399;
+  --theme:     #F472B6;
+  --todo:      #94A3B8;
+  --document:  #60A5FA;
+  --concept:   #2DD4BF;
+  --character: #C084FC;
 
   --radius: 10px;
   --radius-sm: 6px;
@@ -298,10 +298,10 @@ button { cursor: pointer; font-family: inherit; }
   white-space: nowrap;
   display: inline-block;
 }
-.chip-person, .tag-person { background: rgba(196,149,106,0.14); color: var(--person); border: 1px solid rgba(196,149,106,0.3); }
-.chip-theme, .tag-theme   { background: rgba(168,124,114,0.14); color: var(--theme);  border: 1px solid rgba(168,124,114,0.3); }
-.chip-place, .tag-place   { background: rgba(110,168,130,0.14); color: var(--place);  border: 1px solid rgba(110,168,130,0.3); }
-.chip-event, .tag-event   { background: rgba(196,104,104,0.14); color: var(--event);  border: 1px solid rgba(196,104,104,0.3); }
+.chip-person, .tag-person { background: rgba(167,139,250,0.14); color: var(--person); border: 1px solid rgba(167,139,250,0.3); }
+.chip-theme, .tag-theme   { background: rgba(244,114,182,0.12); color: var(--theme);  border: 1px solid rgba(244,114,182,0.28); }
+.chip-place, .tag-place   { background: rgba(52,211,153,0.12);  color: var(--place);  border: 1px solid rgba(52,211,153,0.28); }
+.chip-event, .tag-event   { background: rgba(248,113,113,0.12); color: var(--event);  border: 1px solid rgba(248,113,113,0.28); }
 
 /* ── Spinner ─────────────────────────────────────────────────────────────── */
 .spinner {

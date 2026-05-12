@@ -1,14 +1,14 @@
 import { Handle, Position } from '@xyflow/react'
 
 const META = {
-  personNode:    '#C4956A',
-  eventNode:     '#C46868',
-  placeNode:     '#6EA882',
-  characterNode: '#A88A5C',
-  todoNode:      '#B0A07C',
-  documentNode:  '#7A9EA0',
-  themeNode:     '#A87C72',
-  conceptNode:   '#88A87C',
+  personNode:    '#A78BFA',
+  eventNode:     '#F87171',
+  placeNode:     '#34D399',
+  characterNode: '#C084FC',
+  todoNode:      '#94A3B8',
+  documentNode:  '#60A5FA',
+  themeNode:     '#F472B6',
+  conceptNode:   '#2DD4BF',
 }
 
 const MIN_H = 12   // px — least connected node
