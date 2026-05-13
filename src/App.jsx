@@ -11,8 +11,13 @@ export default function App() {
   const {
     isReady, setIsReady, setFolderPath, setApiKey,
     setGraphData, setProcessing, setFileError, clearFileError,
-    showNotification, notification, selectedNode, readerNode,
+    showNotification, notification, selectedNode, readerNode, theme,
   } = useAppStore()
+
+  // Apply persisted theme on first render
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [])
 
   // Bootstrap: load settings + graph data on mount
   useEffect(() => {

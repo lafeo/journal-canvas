@@ -10,25 +10,15 @@ import {
 // ── Colors ───────────────────────────────────────────────────────────────────
 
 export const COLORS = {
-  person:    { edge: '#A78BFA', border: '#7C3AED' },  // purple
-  event:     { edge: '#F87171', border: '#DC2626' },  // soft red
-  place:     { edge: '#34D399', border: '#059669' },  // green
-  theme:     { edge: '#F472B6', border: '#DB2777' },  // hot pink
-  todo:      { edge: '#94A3B8', border: '#64748B' },  // slate
-  document:  { edge: '#60A5FA', border: '#2563EB' },  // blue
-  concept:   { edge: '#2DD4BF', border: '#0D9488' },  // teal
-  character: { edge: '#C084FC', border: '#9333EA' },  // violet
+  person:    { edge: '#9B59B6', border: '#6C3483' },
+  event:     { edge: '#E74C3C', border: '#A93226' },
+  place:     { edge: '#2ECC71', border: '#1A8A4A' },
+  theme:     { edge: '#E91E8C', border: '#A3145F' },
+  todo:      { edge: '#95A5A6', border: '#717D7E' },
+  document:  { edge: '#3498DB', border: '#1A6FA0' },
+  concept:   { edge: '#1ABC9C', border: '#148A6E' },
+  character: { edge: '#8E44AD', border: '#6C3483' },
 }
-
-// ── Cluster focal points for entity mode ──────────────────────────────────────
-// Arranged so knowledge types sit in logical quadrants:
-//   concepts (top-centre)  research lives up high
-//   people (left)          social world on the left
-//   events (top-right)     happenings on the right
-//   characters (right)     fictional people on the right
-//   places (bottom-right)  geography bottom-right
-//   themes (bottom-left)   ideas/feelings bottom-left
-//   todos (far-left)       tasks orbit away from the main graph
 
 const ENTITY_CLUSTERS = {
   person:    { x: -580, y: -120 },
@@ -64,11 +54,9 @@ function seededPos(id, spread) {
   return { x, y }
 }
 
-// ── Core force layout ─────────────────────────────────────────────────────────
-
 function runForceLayout(nodes, edges, options = {}) {
   const {
-    clusterCenters = null,  // null = no type clustering (document mode)
+    clusterCenters = null,
     linkDistance   = 140,
     linkStrength   = 0.45,
     chargeStrength  = -500,
@@ -82,7 +70,6 @@ function runForceLayout(nodes, edges, options = {}) {
 
   const nodeType = (n) => NODE_TYPE_MAP[n.type] || 'document'
 
-  // Build simulation nodes with seeded starting positions near their cluster
   const simNodes = nodes.map((n) => {
     const type = nodeType(n)
     const center = clusterCenters?.[type] || { x: 0, y: 0 }
@@ -106,19 +93,16 @@ function runForceLayout(nodes, edges, options = {}) {
     .force('charge',  forceManyBody().strength(chargeStrength))
     .force('collide', forceCollide(collideRadius).strength(0.8))
 
-  // Type-clustering forces (entity mode only)
   if (clusterCenters) {
     sim
       .force('cx', forceX((n) => clusterCenters[n._type]?.x ?? 0).strength(clusterStrength))
       .force('cy', forceY((n) => clusterCenters[n._type]?.y ?? 0).strength(clusterStrength))
   } else {
-    // Document mode: gentle centering so nodes don't drift to infinity
     sim
       .force('cx', forceX(0).strength(0.02))
       .force('cy', forceY(0).strength(0.02))
   }
 
-  // Run synchronously to completion
   sim.stop()
   for (let i = 0; i < iterations; i++) sim.tick()
 
@@ -130,9 +114,7 @@ function runForceLayout(nodes, edges, options = {}) {
   }))
 }
 
-// ── Degree annotation ─────────────────────────────────────────────────────────
-// Adds relative connection count to each node's data so cylinder fill can be computed.
-
+// relative connection count → bar height
 function withDegree(nodes, edges) {
   const deg = {}
   edges.forEach(e => {
@@ -172,9 +154,6 @@ function makeEdgeSet() {
   }
 }
 
-// ── Live simulation factory (entity mode) ────────────────────────────────────
-// Returns a paused D3 simulation. Canvas runs it live with RAF.
-
 export function createEntitySimulation(nodes, edges) {
   const nodeSet = new Set(nodes.map(n => n.id))
   const simNodes = nodes.map(n => ({ id: n.id, x: n.position.x, y: n.position.y }))
@@ -188,8 +167,8 @@ export function createEntitySimulation(nodes, edges) {
     .force('collide', forceCollide(66).strength(0.92))
     .force('x',       forceX(0).strength(0.04))
     .force('y',       forceY(0).strength(0.04))
-    .alphaDecay(0.045)   // settles in ~3 s then stops completely
-    .velocityDecay(0.88) // very high friction — near-zero jitter
+    .alphaDecay(0.045)
+    .velocityDecay(0.88)
     .stop()
 }
 
@@ -200,7 +179,6 @@ export function buildEntityGraph(graphData) {
   const edges = []
   const addEdge = makeEdgeSet()
 
-  // Inverted index: docId → entity ids per type
   const byDoc = { people: {}, events: {}, places: {}, themes: {}, concepts: {}, characters: {} }
 
   const push = (map, docId, id) => {
@@ -281,8 +259,6 @@ export function buildEntityGraph(graphData) {
 
   if (nodes.length === 0) return { nodes: [], edges: [] }
 
-  // Give each node a deterministic starting position near its type cluster.
-  // The live simulation in Canvas takes over from here.
   const seeded = nodes.map(n => {
     const type   = NODE_TYPE_MAP[n.type] || 'document'
     const center = ENTITY_CLUSTERS[type] || { x: 0, y: 0 }

@@ -89,10 +89,10 @@ export default function Sidebar() {
       </div>
 
       <div className="sidebar-legend">
-        <div className="legend-item"><span className="legend-dot" style={{ background: '#A78BFA' }} /> People</div>
-        <div className="legend-item"><span className="legend-dot" style={{ background: '#34D399' }} /> Places</div>
-        <div className="legend-item"><span className="legend-dot" style={{ background: '#C084FC' }} /> Characters</div>
-        <div className="legend-item"><span className="legend-dot" style={{ background: '#F87171' }} /> Events</div>
+        <div className="legend-item"><span className="legend-dot" style={{ background: '#9B59B6' }} /> People</div>
+        <div className="legend-item"><span className="legend-dot" style={{ background: '#2ECC71' }} /> Places</div>
+        <div className="legend-item"><span className="legend-dot" style={{ background: '#8E44AD' }} /> Characters</div>
+        <div className="legend-item"><span className="legend-dot" style={{ background: '#E74C3C' }} /> Events</div>
       </div>
 
       <div className="file-list">

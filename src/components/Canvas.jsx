@@ -46,20 +46,17 @@ const ALL_TYPES = new Set(FILTERS.map(f => f.type))
 
 export default function Canvas() {
   const { graphData, mode, setSelectedNode, selectedNode, activeTopic, setActiveTopic,
-          focusedNodeId, setFocusedNodeId } = useAppStore()
+          focusedNodeId, setFocusedNodeId, theme } = useAppStore()
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [enabled, setEnabled]           = useState(new Set(ALL_TYPES))
   const simRef = useRef(null)
 
-  // Clear node focus when a topic is activated from sidebar
   useEffect(() => {
     if (activeTopic) { setFocusedNodeId(null); setSelectedNode(null) }
   }, [activeTopic, setSelectedNode, setFocusedNodeId])
 
-  // Rebuild graph + start live simulation when data / mode changes
   useEffect(() => {
-    // Always stop any running simulation first
     if (simRef.current) { simRef.current.stop(); simRef.current = null }
 
     if (mode === 'document') {
@@ -68,7 +65,6 @@ export default function Canvas() {
       return
     }
 
-    // Entity mode — seed initial positions then hand off to live sim
     const { nodes: rawNodes, edges: rawEdges } = buildEntityGraph(graphData)
     setNodes(rawNodes)
     setEdges(rawEdges)
@@ -268,7 +264,6 @@ export default function Canvas() {
     })
   }, [])
 
-  // avoid shadowing — rename inner setter to match outer state name
   const setEnabledTypes = setEnabled
 
   const isEmpty = graphData.documents.length === 0
@@ -318,12 +313,20 @@ export default function Canvas() {
         defaultEdgeOptions={{ type: 'straight' }}
         proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={28} size={1} color="#1a1a1a" />
-        <Controls style={{ background: '#161616', border: '1px solid #2a2a2a', borderRadius: 8 }} />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={28} size={1}
+          color={theme === 'light' ? '#C8BFB0' : '#1E1A16'}
+        />
+        <Controls style={{
+          background: theme === 'light' ? '#FFFEF8' : '#161310',
+          border: `2px solid ${theme === 'light' ? '#C8BFB0' : '#302820'}`,
+          borderRadius: 8,
+        }} />
         <MiniMap
-          style={{ backgroundColor: '#0e0e0e' }}
-          nodeColor={n => COLORS[NODE_TYPE_MAP[n.type] || 'document']?.border || '#444'}
-          maskColor="rgba(0,0,0,0.72)"
+          style={{ backgroundColor: theme === 'light' ? '#FAF7F0' : '#0F0D0B' }}
+          nodeColor={n => COLORS[NODE_TYPE_MAP[n.type] || 'document']?.border || '#555'}
+          maskColor={theme === 'light' ? 'rgba(250,247,240,0.8)' : 'rgba(0,0,0,0.72)'}
         />
       </ReactFlow>
 

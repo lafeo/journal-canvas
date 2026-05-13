@@ -10,11 +10,12 @@ const useAppStore = create((set, get) => ({
   graphData: { documents: [], people: [], events: [], places: [], themes: [], todos: [] },
 
   // UI state
-  mode: 'entity',          // 'entity' | 'document'
+  mode: 'entity',
   selectedNode: null,
-  activeTopic: null,       // { type: 'theme'|'concept', id: string, name: string } | null
-  focusedNodeId: null,     // node ID highlighted on graph (drives dim-everything-else logic)
-  readerNode: null,        // node open in the reader panel
+  activeTopic: null,
+  focusedNodeId: null,
+  readerNode: null,
+  theme: typeof window !== 'undefined' ? (localStorage.getItem('jc-theme') || 'dark') : 'dark',
   processingFiles: new Set(),
   fileErrors: {},
   notification: null,
@@ -28,6 +29,11 @@ const useAppStore = create((set, get) => ({
   setActiveTopic: (t) => set({ activeTopic: t }),
   setFocusedNodeId: (id) => set({ focusedNodeId: id }),
   setReaderNode: (n) => set({ readerNode: n }),
+  setTheme: (t) => {
+    localStorage.setItem('jc-theme', t)
+    document.documentElement.setAttribute('data-theme', t)
+    set({ theme: t })
+  },
 
   setProcessing: (fp, active) => set((s) => {
     const next = new Set(s.processingFiles)

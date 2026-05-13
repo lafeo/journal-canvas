@@ -1,21 +1,22 @@
 import { Handle, Position } from '@xyflow/react'
 
+// slightly darker border for the sketch-border effect
 const META = {
-  personNode:    '#A78BFA',
-  eventNode:     '#F87171',
-  placeNode:     '#34D399',
-  characterNode: '#C084FC',
-  todoNode:      '#94A3B8',
-  documentNode:  '#60A5FA',
-  themeNode:     '#F472B6',
-  conceptNode:   '#2DD4BF',
+  personNode:    { fill: '#9B59B6', border: '#6C3483' },
+  eventNode:     { fill: '#E74C3C', border: '#A93226' },
+  placeNode:     { fill: '#2ECC71', border: '#1A8A4A' },
+  themeNode:     { fill: '#E91E8C', border: '#A3145F' },
+  conceptNode:   { fill: '#1ABC9C', border: '#148A6E' },
+  characterNode: { fill: '#8E44AD', border: '#6C3483' },
+  documentNode:  { fill: '#3498DB', border: '#1A6FA0' },
+  todoNode:      { fill: '#95A5A6', border: '#717D7E' },
 }
 
-const MIN_H = 12   // px — least connected node
-const MAX_H = 58   // px — most connected node
+const MIN_H = 14
+const MAX_H = 60
 
 export default function CylNode({ data, type }) {
-  const color = META[type] || '#888'
+  const meta = META[type] || { fill: '#888', border: '#555' }
 
   const degree    = data.degree    ?? 0
   const maxDegree = data.maxDegree ?? 1
@@ -39,11 +40,11 @@ export default function CylNode({ data, type }) {
 
       <div
         className="bar-body"
-        style={{ backgroundColor: color, height: barH }}
+        style={{ backgroundColor: meta.fill, borderColor: meta.border, height: barH }}
       />
 
       {label && (
-        <div className="bar-label" style={{ color }}>{label}</div>
+        <div className="bar-label" style={{ color: meta.fill }}>{label}</div>
       )}
     </div>
   )

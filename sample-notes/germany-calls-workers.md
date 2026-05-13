@@ -10,6 +10,10 @@ The Indian pipeline is especially interesting. Germany and India signed a migrat
 
 Munich and Berlin are the main landing cities. Munich for its industrial and tech ecosystem, Berlin for its startup culture and relatively affordable (by German city standards) housing. Frankfurt sees significant inflows of finance professionals.
 
+
+
+Bro I am trying to figure out if I want to go out and Visit Africa?
+
 There's a tension Germany hasn't fully resolved: it needs workers and is making legal pathways much clearer, while simultaneously the political mood around migration is hardening. The AfD frames any discussion of worker recruitment as contradicting border security. Friedrich Merz has to thread that needle constantly.
 
 The climate context matters too — as weather disruption hits agricultural regions globally, migration pressure will increase regardless of any government's preference. Germany's skills shortage creates a channel for managed, mutually beneficial migration. Whether the politics allows that channel to stay open is the real question.

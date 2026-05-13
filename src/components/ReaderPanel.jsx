@@ -11,12 +11,12 @@ const TYPE_COLOR = {
 }
 
 const TYPE_BG = {
-  person:    'rgba(167,139,250,0.15)',
-  place:     'rgba(52,211,153,0.14)',
-  theme:     'rgba(244,114,182,0.13)',
-  concept:   'rgba(45,212,191,0.13)',
-  character: 'rgba(192,132,252,0.14)',
-  event:     'rgba(248,113,113,0.14)',
+  person:    'rgba(155,89,182,0.16)',
+  place:     'rgba(46,204,113,0.14)',
+  theme:     'rgba(233,30,140,0.13)',
+  concept:   'rgba(26,188,156,0.13)',
+  character: 'rgba(142,68,173,0.14)',
+  event:     'rgba(231,76,60,0.14)',
 }
 
 function escapeRegex(s) {
