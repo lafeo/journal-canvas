@@ -1,0 +1,13 @@
+# India — Weather, Heat, and What It Means
+
+India's relationship with weather has always been intense — the monsoon is foundational, not just meteorological. It shapes agriculture, water supply, festivals, migration patterns, the entire rhythm of the year. But what's happening now is something different from natural variability.
+
+The heat waves of the last three years have been exceptional by any historical measure. Delhi hit 47°C in May 2025. In parts of Rajasthan and Uttar Pradesh, the wet-bulb temperature — the measure that captures both heat and humidity together, the one that tells you whether a human body can survive outdoors — crossed dangerous thresholds. Daily wage workers, construction workers, people who have no choice but to be outside, paid the highest price.
+
+Dr. Priya Sharma has become one of the more important voices documenting this. Her research at the Indian Institute of Tropical Meteorology tracks monsoon behaviour across decades, and the pattern she describes is alarming: the monsoon onset is shifting, the intensity is becoming more uneven — longer dry spells interrupted by heavier, more destructive rain events rather than the sustained, distributed rainfall that agriculture depends on. Mumbai gets flash flooding that overwhelms drains designed for an older climate pattern. Delhi has groundwater depletion that makes the city increasingly dependent on distant reservoirs.
+
+What I think gets underappreciated is the economic feedback loop. Crop failures from heat and irregular monsoon push rural workers into cities — Delhi, Mumbai — which are already stretched. Urban heat islands make cities hotter still. Workers move to places like Germany, Canada, Australia partly because those countries still feel manageable, liveable year-round in a way that parts of India are beginning not to be during summer months.
+
+The irony is that India's contribution to historical carbon emissions is relatively modest compared to the US, Europe, or China, yet India is disproportionately bearing the consequences. Rajasthan farmer communities that have nothing to do with industrial emissions are losing livelihoods to heat that rich-world industrial growth produced.
+
+Climate change is pushing migration in ways that policy is nowhere near equipped to handle. The conversation about German skilled worker shortages and Indian engineers moving to Munich only makes sense in a world where the climate differential — where you can live and work comfortably — is increasingly a factor alongside wages and opportunity. Dr. Priya Sharma has written about this explicitly: the migration of talent is partly a canary for the migration of survival.
