@@ -3,597 +3,654 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Journal Canvas — Open Source Knowledge Graph for Your Notes</title>
-  <meta name="description" content="Journal Canvas reads your notes and builds a live knowledge graph of every person, place, event, and theme inside them. Free and open source." />
-  <meta property="og:title" content="Journal Canvas" />
-  <meta property="og:description" content="An open-source AI-powered knowledge graph for your notes." />
+  <title>Journal Canvas — Knowledge graph for your notes</title>
+  <meta name="description" content="An open-source desktop app that turns your Markdown notes into a live knowledge graph. Free, local-first, MIT licensed." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Krub:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg0: #080808;
-      --bg1: #111;
-      --bg2: #181818;
-      --border: #252525;
-      --text0: #f0f0f0;
-      --text1: #999;
-      --text2: #555;
-      --person:    #C4956A;
-      --event:     #C46868;
-      --place:     #6EA882;
-      --theme:     #A87C72;
-      --document:  #7A9EA0;
-      --concept:   #88A87C;
-      --character: #A88A5C;
-      --accent:    #C4956A;
+      --white:   #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-300:#d1d5db;
+      --gray-500:#6b7280;
+      --gray-700:#374151;
+      --gray-900:#111827;
+      --purple:  #9B59B6;
+      --red:     #E74C3C;
+      --green:   #2ECC71;
+      --pink:    #E91E8C;
+      --teal:    #1ABC9C;
+      --blue:    #3498DB;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg0);
-      color: var(--text0);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Krub', system-ui, sans-serif;
       font-size: 16px;
-      line-height: 1.65;
+      color: var(--gray-900);
+      background: var(--white);
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { opacity: 0.8; }
+    a { color: var(--gray-900); text-decoration: none; }
 
     /* ── Nav ── */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gray-200);
       height: 56px;
-      background: rgba(8,8,8,0.88);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: 0 40px;
+      gap: 32px;
       z-index: 100;
     }
 
     .nav-logo {
       font-weight: 700;
       font-size: 15px;
-      color: var(--text0);
-      letter-spacing: -0.3px;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { font-size: 13px; color: var(--text1); }
-    .nav-links a:hover { color: var(--text0); opacity: 1; }
+    .nav-logo-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--purple);
+    }
 
-    .btn {
-      display: inline-flex;
+    .nav-links {
+      display: flex;
+      gap: 24px;
       align-items: center;
-      gap: 7px;
-      padding: 9px 20px;
-      border-radius: 8px;
-      font-size: 13px;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      font-size: 14px;
       font-weight: 500;
+      color: var(--gray-500);
+      transition: color 0.12s;
+    }
+
+    .nav-links a:hover { color: var(--gray-900); }
+
+    .nav-btn {
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
       font-family: inherit;
       cursor: pointer;
       border: none;
-      transition: opacity 0.14s;
+      transition: opacity 0.12s;
+      background: var(--gray-900);
+      color: var(--white);
     }
-    .btn:hover { opacity: 0.85; }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-ghost {
-      background: transparent;
-      color: var(--text1);
-      border: 1px solid var(--border);
+    .nav-btn:hover { opacity: 0.8; }
+
+    /* ── Layout helpers ── */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 32px;
     }
 
     /* ── Hero ── */
     .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      padding: 96px 32px 72px;
       text-align: center;
-      padding: 100px 24px 60px;
+      max-width: 760px;
+      margin: 0 auto;
     }
 
-    .hero-badge {
+    .badge {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 5px 14px;
-      border: 1px solid var(--border);
+      gap: 6px;
+      padding: 4px 12px;
       border-radius: 20px;
-      font-size: 12px;
-      color: var(--text1);
-      margin-bottom: 28px;
-      background: var(--bg1);
+      border: 1px solid var(--gray-200);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-500);
+      margin-bottom: 24px;
+      background: var(--gray-50);
     }
-    .hero-badge-dot {
+
+    .badge-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--place);
+      background: var(--green);
     }
 
     h1 {
-      font-size: clamp(38px, 7vw, 76px);
-      font-weight: 800;
-      letter-spacing: -2px;
-      line-height: 1.05;
-      margin-bottom: 22px;
+      font-size: clamp(34px, 6vw, 58px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      color: var(--gray-900);
     }
+
+    h1 span { color: var(--purple); }
 
     .hero-sub {
-      font-size: clamp(16px, 2.5vw, 20px);
-      color: var(--text1);
-      max-width: 560px;
-      margin-bottom: 40px;
+      font-size: 18px;
+      color: var(--gray-500);
       line-height: 1.7;
+      margin-bottom: 40px;
+      font-weight: 400;
     }
 
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-
-    /* ── Graph preview ── */
-    .graph-preview {
-      margin-top: 72px;
-      width: 100%;
-      max-width: 900px;
-      background: var(--bg1);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      padding: 32px;
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
-    .graph-demo {
-      position: relative;
-      height: 280px;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all 0.12s;
+    }
+
+    .btn-dark  { background: var(--gray-900); color: var(--white); }
+    .btn-dark:hover { background: var(--gray-700); }
+    .btn-light { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+    .btn-light:hover { background: var(--gray-200); }
+
+    /* ── Entity dots strip ── */
+    .entity-strip {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 48px auto 0;
+    }
+
+    .entity-pill {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
     }
 
-    .node-group {
+    .entity-pill-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+
+    /* ── Demo graph ── */
+    .demo-wrap {
+      max-width: 900px;
+      margin: 64px auto 0;
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #0f0d0b;
+    }
+
+    .demo-bar {
+      height: 36px;
+      background: #161310;
+      border-bottom: 1px solid #2a2522;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+    }
+
+    .demo-traffic { width: 12px; height: 12px; border-radius: 50%; }
+
+    .demo-canvas {
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .d-node {
       position: absolute;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
+      transform: translate(-50%, -50%);
     }
 
-    .demo-count { font-size: 9px; color: #FF69B4; font-weight: 600; }
+    .d-count {
+      font-family: 'Krub', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      color: #FF69B4;
+    }
 
-    .demo-bar {
+    .d-bar {
       width: 24px;
       border-radius: 3px;
+      border: 2px solid rgba(0,0,0,0.3);
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
     }
 
-    .demo-label {
-      font-size: 9.5px;
-      font-weight: 500;
+    .d-label {
+      font-family: 'Krub', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
       white-space: nowrap;
     }
 
-    .demo-edge {
+    .d-edge {
       position: absolute;
-      background: var(--border);
       height: 1px;
+      background: #3a3530;
       transform-origin: left center;
+      pointer-events: none;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--gray-200);
+      margin: 0 32px;
     }
 
     /* ── Features ── */
-    section { padding: 96px 24px; }
+    .features {
+      padding: 96px 32px;
+    }
 
-    .section-label {
-      font-size: 11px;
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--text2);
+      letter-spacing: 1px;
+      color: var(--purple);
       margin-bottom: 12px;
     }
 
-    .section-title {
-      font-size: clamp(26px, 4vw, 40px);
+    h2 {
+      font-size: clamp(24px, 4vw, 38px);
       font-weight: 700;
       letter-spacing: -0.8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    .section-body {
-      font-size: 17px;
-      color: var(--text1);
-      max-width: 560px;
-      line-height: 1.7;
+    .section-sub {
+      font-size: 16px;
+      color: var(--gray-500);
+      max-width: 520px;
+      margin-bottom: 56px;
     }
 
-    .features-grid {
+    .feature-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      max-width: 960px;
-      margin: 56px auto 0;
+      gap: 1px;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--gray-200);
     }
 
-    .feature-card {
-      background: var(--bg1);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
+    .feature-cell {
+      background: var(--white);
+      padding: 28px;
     }
 
     .feature-icon {
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      margin-bottom: 14px;
-      background: var(--bg2);
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+      background: var(--gray-50);
     }
 
     .feature-title {
       font-size: 15px;
       font-weight: 600;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
     }
 
     .feature-desc {
-      font-size: 13px;
-      color: var(--text1);
-      line-height: 1.6;
+      font-size: 14px;
+      color: var(--gray-500);
+      line-height: 1.65;
+      font-weight: 400;
     }
 
     /* ── How it works ── */
+    .how {
+      padding: 96px 32px;
+      background: var(--gray-50);
+      border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
     .steps {
-      max-width: 700px;
+      max-width: 640px;
       margin: 56px auto 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
     }
 
     .step {
       display: flex;
-      gap: 24px;
-      padding: 28px 0;
-      border-bottom: 1px solid var(--border);
+      gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-200);
     }
     .step:last-child { border-bottom: none; }
 
     .step-num {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text2);
-      flex-shrink: 0;
-      margin-top: 2px;
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1.5px solid var(--gray-300);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: var(--gray-500);
+      flex-shrink: 0; margin-top: 1px;
     }
 
-    .step-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 5px;
+    .step-title { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+    .step-desc  { font-size: 14px; color: var(--gray-500); line-height: 1.65; }
+    .step-desc code {
+      background: var(--gray-100);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--gray-700);
     }
 
-    .step-desc { font-size: 14px; color: var(--text1); line-height: 1.6; }
+    /* ── Stack ── */
+    .stack { padding: 80px 32px; }
 
-    /* ── Tech stack ── */
-    .stack-pills {
+    .stack-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 40px;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
     }
 
-    .stack-pill {
-      padding: 6px 14px;
+    .stack-chip {
+      padding: 5px 14px;
       border-radius: 20px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--text1);
-      background: var(--bg1);
+      border: 1px solid var(--gray-200);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-700);
+      background: var(--gray-50);
     }
 
     /* ── CTA ── */
     .cta {
+      padding: 96px 32px;
+      border-top: 1px solid var(--gray-200);
       text-align: center;
-      padding: 96px 24px;
-      border-top: 1px solid var(--border);
     }
 
-    .cta h2 {
-      font-size: clamp(26px, 4vw, 44px);
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 14px;
-    }
-
-    .cta p {
-      font-size: 17px;
-      color: var(--text1);
-      margin-bottom: 36px;
-    }
+    .cta h2 { margin-bottom: 14px; }
+    .cta p  { font-size: 16px; color: var(--gray-500); margin-bottom: 36px; }
 
     /* ── Footer ── */
     footer {
-      padding: 28px 40px;
-      border-top: 1px solid var(--border);
+      padding: 24px 40px;
+      border-top: 1px solid var(--gray-200);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
-      color: var(--text2);
+      font-size: 13px;
+      color: var(--gray-500);
     }
 
-    .entity-dots {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 20px;
-      justify-content: center;
-    }
-    .entity-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-    }
-
-    /* center wrappers */
-    .center { text-align: center; }
-    .max-w { max-width: 960px; margin: 0 auto; }
+    footer a { color: var(--gray-500); }
+    footer a:hover { color: var(--gray-900); }
   </style>
 </head>
 <body>
 
 <nav>
-  <div class="nav-logo">Journal Canvas</div>
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    Journal Canvas
+  </div>
   <div class="nav-links">
     <a href="#features">Features</a>
-    <a href="#how-it-works">How it works</a>
+    <a href="#how">How it works</a>
     <a href="https://github.com/lafeo/journal-canvas" target="_blank">GitHub</a>
-    <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-primary" target="_blank">Download</a>
+    <a href="https://github.com/lafeo/journal-canvas/releases" class="nav-btn" target="_blank">Download</a>
   </div>
 </nav>
 
 <!-- Hero -->
 <div class="hero">
-  <div class="hero-badge">
-    <span class="hero-badge-dot"></span>
+  <div class="badge">
+    <span class="badge-dot"></span>
     Open source · MIT License
   </div>
 
-  <h1>Your notes,<br/>as a knowledge graph</h1>
+  <h1>Your notes,<br/>as a <span>knowledge graph</span></h1>
 
   <p class="hero-sub">
-    Journal Canvas reads your Markdown and text files, extracts every person, place, event, and theme using AI, and builds a live graph so you can see how everything connects.
+    Point it at a folder of Markdown files. Journal Canvas extracts every person, place, event, and theme — then builds a live graph showing how everything connects.
   </p>
 
-  <div class="entity-dots">
-    <div class="entity-dot" style="background:#C4956A" title="People"></div>
-    <div class="entity-dot" style="background:#C46868" title="Events"></div>
-    <div class="entity-dot" style="background:#6EA882" title="Places"></div>
-    <div class="entity-dot" style="background:#A87C72" title="Themes"></div>
-    <div class="entity-dot" style="background:#7A9EA0" title="Documents"></div>
-    <div class="entity-dot" style="background:#88A87C" title="Concepts"></div>
-  </div>
-
-  <div class="hero-actions">
-    <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-primary" target="_blank">
-      ↓ Download for macOS
+  <div class="hero-cta">
+    <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-dark" target="_blank">
+      ↓ &nbsp;Download for macOS
     </a>
-    <a href="https://github.com/lafeo/journal-canvas" class="btn btn-ghost" target="_blank">
-      View on GitHub
+    <a href="https://github.com/lafeo/journal-canvas" class="btn btn-light" target="_blank">
+      View source on GitHub
     </a>
   </div>
 
-  <!-- Fake graph demo -->
-  <div class="graph-preview">
-    <div class="graph-demo" id="demo"></div>
+  <div class="entity-strip">
+    <div class="entity-pill"><span class="entity-pill-dot" style="background:#9B59B6"></span>People</div>
+    <div class="entity-pill"><span class="entity-pill-dot" style="background:#E74C3C"></span>Events</div>
+    <div class="entity-pill"><span class="entity-pill-dot" style="background:#2ECC71"></span>Places</div>
+    <div class="entity-pill"><span class="entity-pill-dot" style="background:#E91E8C"></span>Themes</div>
+    <div class="entity-pill"><span class="entity-pill-dot" style="background:#1ABC9C"></span>Concepts</div>
+  </div>
+</div>
+
+<!-- Demo -->
+<div class="container">
+  <div class="demo-wrap">
+    <div class="demo-bar">
+      <div class="demo-traffic" style="background:#E74C3C"></div>
+      <div class="demo-traffic" style="background:#E91E8C"></div>
+      <div class="demo-traffic" style="background:#2ECC71"></div>
+    </div>
+    <div class="demo-canvas" id="demo"></div>
   </div>
 </div>
 
 <!-- Features -->
-<section id="features">
-  <div class="max-w center">
-    <div class="section-label">Features</div>
-    <h2 class="section-title">Everything lives in your files</h2>
-    <p class="section-body" style="margin:0 auto">
-      No proprietary database. No sync service. Journal Canvas works with plain text files you already own.
-    </p>
-  </div>
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-eyebrow">Features</div>
+    <h2>Everything stays in your files</h2>
+    <p class="section-sub">No database. No cloud sync. No account. Works with plain text you already own.</p>
 
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">⬡</div>
-      <div class="feature-title">Live knowledge graph</div>
-      <div class="feature-desc">A force-directed graph that clusters nodes by how many documents they share — not by type. Heavily connected entities pull together naturally.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">◈</div>
-      <div class="feature-title">AI entity extraction</div>
-      <div class="feature-desc">Claude reads each document and extracts people, places, events, themes, and concepts. Existing entities are recognised and merged, never duplicated.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📖</div>
-      <div class="feature-title">Inline reader</div>
-      <div class="feature-desc">Click any node to read every document it appears in. Every entity in the text is colour-highlighted. Click a name to focus the graph on it.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✎</div>
-      <div class="feature-title">Click-to-edit</div>
-      <div class="feature-desc">Click anywhere on a document in the reader to edit it. Saves automatically on blur, then re-analyses and updates the graph.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">✦</div>
-      <div class="feature-title">Theme & concept sidebar</div>
-      <div class="feature-desc">Themes and concepts live in a dedicated sidebar. Click one to instantly illuminate everything connected to it across the graph.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">◌</div>
-      <div class="feature-title">Hide without deleting</div>
-      <div class="feature-desc">Hide any note from the graph without touching the file. Its entities vanish from the graph. Restore in one click whenever you need them back.</div>
+    <div class="feature-grid">
+      <div class="feature-cell">
+        <div class="feature-icon">⬡</div>
+        <div class="feature-title">Live knowledge graph</div>
+        <div class="feature-desc">A D3 force simulation clusters nodes by connection strength. The more two entities share documents, the closer they sit.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">◈</div>
+        <div class="feature-title">AI entity extraction</div>
+        <div class="feature-desc">Claude reads each document and extracts people, places, events, themes, and concepts. Existing entities are recognised and merged, never duplicated.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">📖</div>
+        <div class="feature-title">Inline reader</div>
+        <div class="feature-desc">Click any node to read every document it appears in. Every entity in the text is colour-highlighted. Click a name to focus the graph on it.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">✎</div>
+        <div class="feature-title">Click-to-edit</div>
+        <div class="feature-desc">Click anywhere on a document in the reader to edit it. Saves on blur, then re-analyses and updates the graph automatically.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">✦</div>
+        <div class="feature-title">Themes & concepts sidebar</div>
+        <div class="feature-desc">Themes and concepts live in a dedicated sidebar. Click one to immediately illuminate everything connected to it across the graph.</div>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">☾</div>
+        <div class="feature-title">Light & dark mode</div>
+        <div class="feature-desc">Toggle between a warm dark canvas and a clean light paper mode. Preference is saved between sessions.</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- How it works -->
-<section id="how-it-works" style="background: var(--bg1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-  <div class="max-w center">
-    <div class="section-label">How it works</div>
-    <h2 class="section-title">From files to graph in seconds</h2>
-  </div>
+<!-- How -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="section-eyebrow">How it works</div>
+    <h2>From folder to graph in seconds</h2>
 
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div>
-        <div class="step-title">Point it at your notes folder</div>
-        <div class="step-desc">Any folder of <code>.md</code> or <code>.txt</code> files works. Journal Canvas watches the folder for changes in real time.</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Point it at your notes folder</div>
+          <div class="step-desc">Any folder of <code>.md</code> or <code>.txt</code> files works. Journal Canvas watches for changes in real time.</div>
+        </div>
       </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div>
-        <div class="step-title">Claude extracts structured knowledge</div>
-        <div class="step-desc">Each document is sent to Claude with your existing entity list. Claude identifies people, places, events, themes, concepts — and reuses names it has already seen.</div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Claude extracts structured knowledge</div>
+          <div class="step-desc">Each document is sent to Claude with your existing entity list. Claude identifies entities and reuses names it has already seen — no duplicates.</div>
+        </div>
       </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div>
-        <div class="step-title">The graph builds itself</div>
-        <div class="step-desc">Entities that co-appear in documents are linked. A D3 force simulation settles the graph into natural clusters. The more two entities appear together, the closer they sit.</div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">The graph builds itself</div>
+          <div class="step-desc">Entities that co-appear in documents are linked. The force simulation settles the graph into natural clusters.</div>
+        </div>
       </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div>
-        <div class="step-title">Explore, read, and edit</div>
-        <div class="step-desc">Click nodes to focus their connections. Open the reader to see every mention of an entity across all your notes. Edit inline — changes update the graph automatically.</div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Explore, read, and edit</div>
+          <div class="step-desc">Click nodes to focus connections. Open the reader to see every mention of an entity across all your notes. Edit inline — changes update the graph automatically.</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Stack -->
-<section>
-  <div class="max-w center">
-    <div class="section-label">Built with</div>
-    <h2 class="section-title">Open source, all the way down</h2>
-    <p class="section-body" style="margin:0 auto">No telemetry. No accounts. Your notes never leave your machine except for the Claude API call you make with your own key.</p>
-  </div>
-  <div class="stack-pills" style="justify-content:center">
-    <span class="stack-pill">Electron</span>
-    <span class="stack-pill">React 18</span>
-    <span class="stack-pill">Vite</span>
-    <span class="stack-pill">React Flow</span>
-    <span class="stack-pill">D3-force</span>
-    <span class="stack-pill">Zustand</span>
-    <span class="stack-pill">Claude API</span>
-    <span class="stack-pill">MIT License</span>
+<section class="stack">
+  <div class="container">
+    <div class="section-eyebrow">Built with</div>
+    <h2>Open source, all the way down</h2>
+    <p class="section-sub" style="margin-bottom:0">No telemetry. No accounts. Notes never leave your machine except for the Claude API call you make with your own key.</p>
+    <div class="stack-row">
+      <span class="stack-chip">Electron</span>
+      <span class="stack-chip">React 18</span>
+      <span class="stack-chip">Vite</span>
+      <span class="stack-chip">React Flow</span>
+      <span class="stack-chip">D3-force</span>
+      <span class="stack-chip">Zustand</span>
+      <span class="stack-chip">Claude API</span>
+      <span class="stack-chip">MIT License</span>
+    </div>
   </div>
 </section>
 
 <!-- CTA -->
-<div class="cta">
-  <h2>Start mapping your notes</h2>
-  <p>Free forever. No account needed. Bring your own Claude API key.</p>
-  <div class="hero-actions">
-    <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-primary" target="_blank">↓ Download</a>
-    <a href="https://github.com/lafeo/journal-canvas" class="btn btn-ghost" target="_blank">Star on GitHub ★</a>
+<section class="cta">
+  <div class="container">
+    <h2>Start mapping your notes</h2>
+    <p>Free forever. No account needed. Bring your own Claude API key.</p>
+    <div class="hero-cta">
+      <a href="https://github.com/lafeo/journal-canvas/releases" class="btn btn-dark" target="_blank">↓ &nbsp;Download</a>
+      <a href="https://github.com/lafeo/journal-canvas" class="btn btn-light" target="_blank">Star on GitHub ☆</a>
+    </div>
   </div>
-</div>
+</section>
 
 <footer>
   <span>Journal Canvas · MIT License</span>
-  <span>Made by <a href="https://github.com/lafeo" style="color:var(--text1)">@lafeo</a></span>
+  <span><a href="https://github.com/lafeo/journal-canvas">github.com/lafeo/journal-canvas</a></span>
 </footer>
 
 <script>
-  // Draw a simple fake graph in the hero demo area
   const demo = document.getElementById('demo')
+  const W = demo.clientWidth || 860
+  const H = 300
 
   const nodes = [
-    { label: 'Dr. Priya Sharma', color: '#C4956A', count: 4, x: 50,  y: 50  },
-    { label: 'Germany',          color: '#6EA882', count: 5, x: 75,  y: 30  },
-    { label: 'climate change',   color: '#A87C72', count: 4, x: 62,  y: 68  },
-    { label: 'Indian engineers', color: '#7A9EA0', count: 2, x: 35,  y: 38  },
-    { label: 'Olaf Scholz',      color: '#C4956A', count: 3, x: 85,  y: 55  },
-    { label: 'Delhi',            color: '#6EA882', count: 2, x: 28,  y: 60  },
-    { label: 'brain drain',      color: '#A87C72', count: 2, x: 45,  y: 72  },
-    { label: 'Arjun Mehta',      color: '#C4956A', count: 2, x: 20,  y: 46  },
+    { label: 'Dr. Priya Sharma', color: '#9B59B6', count: 4, x: 48, y: 48 },
+    { label: 'Germany',          color: '#2ECC71', count: 5, x: 72, y: 32 },
+    { label: 'climate change',   color: '#E91E8C', count: 4, x: 60, y: 70 },
+    { label: 'Olaf Scholz',      color: '#9B59B6', count: 3, x: 84, y: 52 },
+    { label: 'Delhi',            color: '#2ECC71', count: 2, x: 28, y: 60 },
+    { label: 'brain drain',      color: '#E91E8C', count: 2, x: 42, y: 78 },
+    { label: 'Arjun Mehta',      color: '#9B59B6', count: 2, x: 20, y: 44 },
+    { label: 'Indian engineers', color: '#1ABC9C', count: 2, x: 33, y: 35 },
   ]
 
-  const edges = [
-    [0,1],[0,2],[0,5],[0,6],[1,4],[1,2],[2,5],[2,6],[3,0],[3,8],[6,3],[7,3],[7,6]
-  ]
+  const edges = [[0,1],[0,2],[0,4],[1,3],[2,4],[2,5],[6,7],[7,0],[5,6]]
 
-  const W = demo.clientWidth || 860
-  const H = 280
-
-  const minH = 10, maxH = 44
   const counts = nodes.map(n => n.count)
   const maxC = Math.max(...counts), minC = Math.min(...counts)
 
-  // Draw edges first
   edges.forEach(([a, b]) => {
     if (!nodes[a] || !nodes[b]) return
-    const na = nodes[a], nb = nodes[b]
-    const x1 = na.x / 100 * W, y1 = na.y / 100 * H
-    const x2 = nb.x / 100 * W, y2 = nb.y / 100 * H
-    const len = Math.sqrt((x2-x1)**2 + (y2-y1)**2)
-    const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI
+    const x1 = nodes[a].x / 100 * W, y1 = nodes[a].y / 100 * H
+    const x2 = nodes[b].x / 100 * W, y2 = nodes[b].y / 100 * H
+    const len = Math.hypot(x2 - x1, y2 - y1)
+    const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI
     const el = document.createElement('div')
-    el.className = 'demo-edge'
-    Object.assign(el.style, {
-      left: x1 + 'px', top: y1 + 'px',
-      width: len + 'px',
-      transform: `rotate(${angle}deg)`,
-      opacity: '0.18',
-    })
+    el.className = 'd-edge'
+    Object.assign(el.style, { left: x1 + 'px', top: y1 + 'px', width: len + 'px', transform: `rotate(${angle}deg)` })
     demo.appendChild(el)
   })
 
-  // Draw nodes
   nodes.forEach(n => {
-    const bh = maxC === minC ? 28 : Math.round(minH + ((n.count - minC) / (maxC - minC)) * (maxH - minH))
-    const x = n.x / 100 * W - 12
-    const totalH = 14 + 4 + bh + 4 + 14
-    const y = n.y / 100 * H - totalH / 2
-
+    const bh = maxC === minC ? 28 : Math.round(14 + ((n.count - minC) / (maxC - minC)) * 44)
+    const px = n.x / 100 * W
+    const py = n.y / 100 * H
     const g = document.createElement('div')
-    g.className = 'node-group'
-    Object.assign(g.style, { left: x + 'px', top: y + 'px' })
-
-    const cnt = document.createElement('div')
-    cnt.className = 'demo-count'
-    cnt.textContent = n.count
-    g.appendChild(cnt)
-
-    const bar = document.createElement('div')
-    bar.className = 'demo-bar'
-    Object.assign(bar.style, { height: bh + 'px', backgroundColor: n.color, borderRadius: '3px' })
-    g.appendChild(bar)
-
-    const lbl = document.createElement('div')
-    lbl.className = 'demo-label'
-    Object.assign(lbl.style, { color: n.color })
-    lbl.textContent = n.label
-    g.appendChild(lbl)
-
+    g.className = 'd-node'
+    Object.assign(g.style, { left: px + 'px', top: py + 'px' })
+    g.innerHTML = `
+      <div class="d-count">${n.count}</div>
+      <div class="d-bar" style="height:${bh}px;background:${n.color}"></div>
+      <div class="d-label" style="color:${n.color}">${n.label}</div>
+    `
     demo.appendChild(g)
   })
 </script>
-
 </body>
 </html>
